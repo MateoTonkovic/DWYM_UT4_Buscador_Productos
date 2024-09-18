@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { TextField, Typography, Button } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-
-import "./ProductSearchPage.css";
+import { useEffect, useState } from "react";
+import AddProductDialog from "../../Components/AddProductDialog/AddProductDialog";
 import Card from "../../Components/Card/Card";
+import "./ProductSearchPage.css";
 
 const productsData = [
   {
@@ -72,6 +72,7 @@ const productsData = [
 const ProductSearchPage = () => {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState(productsData);
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     setProducts(
@@ -79,37 +80,62 @@ const ProductSearchPage = () => {
         product.name.toLowerCase().includes(search.toLowerCase())
       )
     );
-  }, [search]);
+  }, [search, productsData]);
 
   return (
-    <div className="product-search-page">
-      <TextField
-        label="Buscar Producto"
-        variant="outlined"
-        fullWidth
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ marginTop: "4rem", marginBottom: "4rem" }}
+    <>
+      <div className="product-search-page">
+        <Box sx={{ display: "flex" }}>
+          <TextField
+            label="Buscar Producto"
+            variant="outlined"
+            fullWidth
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ marginTop: "4rem", marginBottom: "4rem" }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenDialog(true)}
+            style={{
+              marginTop: "4rem",
+              marginBottom: "4rem",
+              marginLeft: "1rem",
+            }}
+          >
+            Agregar Producto
+          </Button>
+        </Box>
+        {products.length > 0 ? (
+          <Grid
+            container
+            rowSpacing={1}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
+            {products.map((product) => (
+              <Grid size={{ xs: 12, md: 4 }} key={product.id}>
+                <Card
+                  name={product.name}
+                  price={product.price}
+                  description={product.description}
+                  image={product.image}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography variant="h6" align="center">
+            No se encontraron resultados
+          </Typography>
+        )}
+      </div>
+      <AddProductDialog
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        setProducts={setProducts}
       />
-      {products.length > 0 ? (
-        <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          {products.map((product) => (
-            <Grid size={{ xs: 12, md: 4 }} key={product.id}>
-              <Card
-                name={product.name}
-                price={product.price}
-                description={product.description}
-                image={product.image}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <Typography variant="h6" align="center">
-          No se encontraron resultados
-        </Typography>
-      )}
-    </div>
+    </>
   );
 };
 
